@@ -98,3 +98,33 @@ plot_top_currencies <- function(currency = 'USD', k = 5, bar_color = 'grey') {
 }
 
 
+#' Backfill historical data of any coin from the coinmarketcap API
+#'
+#' @param coin : the cryptocurrency complete name you want to backfill
+#' @param start : the starting date (e.g. 20180101 for the 1st of January 2018) in numeric or character
+#' @param end : the end date 
+#' @return A ggplot of top Cryptocurrencies based on their rank (Market Cap)
+#' @examples
+#' btc_data <- backfill_historical_coin()
+#' coins_to_backfill <- c("bitcoin", "ethereum", "monero", "ripple")
+#' data_all <- lapply(curr, backfill_historical_coin)
+#' names(dta_all) <- coins_to_backfill
+#' str(dta_all)
+#' # Put on the same scales 
+#' max_b <- max(unlist(lapply(dta_all, nrow)))
+#' min_b <- min(unlist(lapply(dta_all, nrow)))
+#' id_b <- max_b - min_b
+#' dta_all_b <- lapply(dta_all, function(x) x[id_b:max_b, ])
+#' @importFrom rvest fromJSON  
+#' @importFrom xml2
+#' @export
+'backfill_historical_coin' <- function(coin  = "bitcoin",
+                                       start = 20130428,
+                                       end   = gsub("-", "", Sys.Date())) {
+  url  <- paste0(
+    "https://coinmarketcap.com/currencies/", coin,
+    "/historical-data/?start=", start,
+    "&end=", end
+  )
+  return((read_html(url) %>% html_table())[[1]])
+}
